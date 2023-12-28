@@ -1,0 +1,125 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(rgba(0, 0, 0, 0.87),rgba(0, 0, 0, 0.864)),url(../img/bg-img.jpg);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 13%;
+}
+
+.container .laptop {
+    width: 70%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 1.5%;
+}
+
+.container .phone {
+    width: 25%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.columna img {
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.container .laptop .imgBx {
+    position: absolute;
+    top: 0%;
+    width: 75%;
+    height: 85%;
+    background-color: red;
+    /* background: url(../img/dem1_desktop.png);
+    background-position: top;
+    background-size: 100%; */
+    z-index: 0;
+    transition: 5s;
+    margin-top: 2.9%;
+}
+.container .laptop:hover .imgBx{
+    background-position: bottom;
+}
+
+.container .phone .imgBx {
+    position: absolute;
+    top: 1%;
+    width: 95%;
+    height: 98.2%;
+    border-radius: 32px;
+    background-color: blue;
+    /* background: url(../img/dem1_mobile.png);
+    background-position: top;
+    background-size: 100%; */
+    z-index: 0;
+    transition: 7s;
+}
+.container .phone:hover .imgBx{
+    background-position: bottom;
+}
+
+@media(max-width: 1100px) {
+    .container .phone .imgBx {
+        border-radius: 26px;
+    }
+}
+
+@media(max-width: 900px) {
+    
+    .container {
+        height: fit-content;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 2.5rem 7%;
+    }
+    
+    .container .laptop {
+        width: 80%;
+        margin-bottom: 40px;
+    }
+    
+    .container .phone {
+        width: 30%;
+    }
+    
+    .container .laptop .imgBx {
+        top: 0%;
+        width: 76%;
+        height: 85%;
+    }
+    
+    .container .phone .imgBx {
+        border-radius: 28px;
+    }
+}
+
+@media(max-width: 700px) {
+    
+    .container .laptop {
+        width: 100%;
+        margin-bottom: 40px;
+    }
+    
+    .container .phone {
+        width: 70%;
+    }
+}
