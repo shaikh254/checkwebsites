@@ -77,7 +77,7 @@ startCounter02();
 
 let counterValue03 = 0;
 let counterElement03 = document.getElementById('counter-one');
-let animationSpeed03 = 10; // Adjust the speed here (lower value = faster)
+let animationSpeed03 = 0; // Adjust the speed here (lower value = faster)
 
 function startCounter03() {
   requestAnimationFrame(incrementCounter03);
