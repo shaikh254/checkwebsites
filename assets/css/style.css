@@ -1489,17 +1489,6 @@ body {
 
 
 
-.animated-scroller {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s, transform 0.8s;
-}
-
-
-
-
-
-
 
 
 #particles {
@@ -1508,12 +1497,14 @@ body {
   overflow: hidden;
   position: absolute;
   z-index: 0;
+  top: 0;
+  left: 0;
 }
 
 #intro {
   position: absolute;
   left: 0;
-  top: 50%;
+  top: 0;
   padding: 0 10px;
   width: 100%;
   text-align: center;
