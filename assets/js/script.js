@@ -1,29 +1,28 @@
 $(document).ready(function () {
-    function isElementInViewport(el) {
-        var rect = el.getBoundingClientRect();
-        return (
-            rect.top >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-        );
-    }
+  function isElementInViewport(el) {
+    var rect = el.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+    );
+  }
 
-    function handleScroll() {
-        $(".animated-scroller").each(function () {
-            var element = $(this)[0];
-            if (isElementInViewport(element)) {
-                $(this).css({
-                    opacity: 1,
-                    transform: "translateY(0)"
-                });
-            }
+  function handleScroll() {
+    $(".animated-scroller").each(function () {
+      var element = $(this)[0];
+      if (isElementInViewport(element)) {
+        $(this).css({
+          opacity: 1,
+          transform: "translateY(0)"
         });
-    }
+      }
+    });
+  }
 
-    $(window).on("scroll", handleScroll);
+  $(window).on("scroll", handleScroll);
 
-    handleScroll();
+  handleScroll();
 });
-
 
 
 
@@ -31,14 +30,14 @@ $(document).ready(function () {
 
 let counterValue = 0;
 let counterElement = document.getElementById('counter-three');
-let animationSpeed = 0; // Adjust the speed here (lower value = faster)
+let animationSpeed = 20; // Adjust the speed here (lower value = faster)
 
 function startCounter() {
   requestAnimationFrame(incrementCounter);
 }
 
 function incrementCounter() {
-  counterValue++;
+  counterValue = counterValue + 5;
   counterElement.textContent = counterValue;
 
   if (counterValue < 500) {
@@ -77,14 +76,14 @@ startCounter02();
 
 let counterValue03 = 0;
 let counterElement03 = document.getElementById('counter-one');
-let animationSpeed03 = 0; // Adjust the speed here (lower value = faster)
+let animationSpeed03 = 20; // Adjust the speed here (lower value = faster)
 
 function startCounter03() {
   requestAnimationFrame(incrementCounter03);
 }
 
 function incrementCounter03() {
-  counterValue03++;
+  counterValue03 = counterValue03 + 20;
   counterElement03.textContent = counterValue03;
 
   if (counterValue03 < 2000) {
@@ -96,4 +95,7 @@ function incrementCounter03() {
 
 // Start the counter on page load
 startCounter03();
+
+
+
 
