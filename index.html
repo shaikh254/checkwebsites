@@ -959,6 +959,7 @@ const svg = document.getElementById("caliper");
 
 let isDragging = false;
 let startX;
+let dragStartOffset = 0; // 🆕 store offset at drag start
 let offsetX = 0;
 const maxMove = 1630;
 const maxReading = 101.65;
@@ -1003,13 +1004,14 @@ window.addEventListener("touchend", endDrag);
 function startDrag(e) {
   isDragging = true;
   startX = getClientX(e);
+  dragStartOffset = offsetX; // 🆕 remember current offset
   e.preventDefault();
 }
 
 function onDrag(e) {
   if (!isDragging) return;
   const dx = getClientX(e) - startX;
-  const newX = Math.min(Math.max(offsetX + dx, 0), maxMove);
+  const newX = Math.min(Math.max(dragStartOffset + dx, 0), maxMove); // 🆕 use dragStartOffset
 
   movableBack.setAttribute("transform", `translate(${newX},0)`);
   movableFront.setAttribute("transform", `translate(${newX},0)`);
@@ -1025,7 +1027,7 @@ function onDrag(e) {
 function endDrag(e) {
   if (!isDragging) return;
   const dx = getClientX(e) - startX;
-  offsetX = Math.min(Math.max(offsetX + dx, 0), maxMove);
+  offsetX = Math.min(Math.max(dragStartOffset + dx, 0), maxMove); // 🆕 update offset correctly
   isDragging = false;
 }
 
@@ -1119,6 +1121,8 @@ zoomBtn.addEventListener("click", async () => {
 
 
 
+
 </body>
 
 </html>
+
