@@ -5,18 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
 
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-    }
+  <style>
 
     #movableFront,
     #movableBack {
@@ -28,28 +18,17 @@
       cursor: grabbing;
     }
 
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f7f7f7;
-    }
-
-    .canvas {
+    .custom-canvas {
       position: relative;
       width: 100%;
+      height: fit-content;
+      padding-top: 20px;
     }
 
-    /* container for fixed zoom button */
-    svg {
-      width: 100%;
-      display: block;
+    .custom-svg {
       user-select: none;
     }
 
-    /* fixed zoom button (no hover effects) */
     #zoomBtn {
       position: absolute;
       right: 8px;
@@ -66,14 +45,42 @@
       font-size: 18px;
       color: #333;
     }
+    .hide-show-btn {
+position: absolute;
+right: 60px;
+top: 10px;
+padding: 6px 14px;
+font-family: monospace;
+font-size: 20px;
+background: #eee;
+border: 1px solid #ccc;
+border-radius: 6px;
+cursor: pointer;
+user-select: none;
+box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+@media(max-width:767px) {
+  .hide-show-btn {
+    font-size: 18px;
+    padding: 5px 12px;
+    right: 55px;
+  }
+    #zoomBtn {
+      width: 35px;
+      height: 35px;
+      font-size: 16px;
+    }
+}
   </style>
 </head>
 
 <body>
-  <div class="canvas">
+  <div class="custom-canvas">
     <!-- Zoom button fixed on top-right of container -->
     <div id="zoomBtn" title="Zoom to jaw">🔍</div>
-    <svg viewBox="0 0 3077 1444" fill="none" xmlns="http://www.w3.org/2000/svg" id="caliper">
+    <div class="hide-show-btn" id="hideBtn">Hide</div>
+    <svg class="custom-svg" viewBox="0 0 3077 1444" fill="none" xmlns="http://www.w3.org/2000/svg" id="caliper">
       <g id="movableBack">
         <path
           d="M54 58C77.6 28 112.5 2 118.5 2L122 226C113.5 226 108.5 230.5 108.5 235V264H1191V352.5H4V178.5C4 131.5 24.5 95.5 54 58Z"
@@ -958,32 +965,15 @@ const reading = document.getElementById("reading");
 const svg = document.getElementById("caliper");
 
 let isDragging = false;
-let startX = 0;
-let startOffset = 0; // ✅ stores position when drag starts
+let startX;
 let offsetX = 0;
 const maxMove = 1630;
 const maxReading = 101.65;
 
-/* ---------- Hide/Show Button ---------- */
-const hideBtn = document.createElement("div");
-hideBtn.textContent = "Hide";
-Object.assign(hideBtn.style, {
-  position: "absolute",
-  right: "18%",
-  top: "10px",
-  transform: "translateX(160px)",
-  padding: "6px 14px",
-  fontFamily: "monospace",
-  fontSize: "20px",
-  background: "#eee",
-  border: "1px solid #ccc",
-  borderRadius: "6px",
-  cursor: "pointer",
-  userSelect: "none",
-  boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
-});
-document.body.appendChild(hideBtn);
+// Create and style the Hide/Show button
+const hideBtn = document.getElementById("hideBtn");
 
+// Toggle visibility on click
 let readingVisible = true;
 hideBtn.addEventListener("click", () => {
   readingVisible = !readingVisible;
@@ -991,35 +981,32 @@ hideBtn.addEventListener("click", () => {
   hideBtn.textContent = readingVisible ? "Hide" : "Show";
 });
 
-/* ---------- Drag Logic (Mouse + Touch) ---------- */
+/* ---------- Drag logic (desktop + mobile) ---------- */
 
-// 🧠 Use unified event handlers
-function getClientX(e) {
-  return e.touches ? e.touches[0].clientX : e.clientX;
-}
+movableFront.addEventListener("mousedown", startDrag);
+movableFront.addEventListener("touchstart", startDrag, { passive: false });
+
+window.addEventListener("mousemove", onDrag);
+window.addEventListener("touchmove", onDrag, { passive: false });
+
+window.addEventListener("mouseup", endDrag);
+window.addEventListener("touchend", endDrag);
 
 function startDrag(e) {
-  e.preventDefault();
   isDragging = true;
   startX = getClientX(e);
-  startOffset = offsetX; // ✅ keep where slider was
+  e.preventDefault();
 }
 
-function dragMove(e) {
+function onDrag(e) {
   if (!isDragging) return;
-  e.preventDefault();
-  const currentX = getClientX(e);
-  const dx = currentX - startX;
-  let newX = startOffset + dx;
+  const dx = getClientX(e) - startX;
+  const newX = Math.min(Math.max(offsetX + dx, 0), maxMove);
 
-  // Clamp movement 0–maxMove
-  newX = Math.max(0, Math.min(maxMove, newX));
-
-  offsetX = newX;
   movableBack.setAttribute("transform", `translate(${newX},0)`);
   movableFront.setAttribute("transform", `translate(${newX},0)`);
 
-  // Step rounding
+  // ---- Round to 0.05 mm steps ----
   let value = (newX / maxMove) * maxReading;
   value = Math.round(value / 0.05) * 0.05;
   reading.textContent = value.toFixed(2);
@@ -1029,22 +1016,21 @@ function dragMove(e) {
 
 function endDrag(e) {
   if (!isDragging) return;
+  const dx = getClientX(e) - startX;
+  offsetX = Math.min(Math.max(offsetX + dx, 0), maxMove);
   isDragging = false;
 }
 
-movableFront.addEventListener("mousedown", startDrag);
-window.addEventListener("mousemove", dragMove);
-window.addEventListener("mouseup", endDrag);
+function getClientX(e) {
+  return e.touches ? e.touches[0].clientX : e.clientX;
+}
 
-movableFront.addEventListener("touchstart", startDrag, { passive: false });
-window.addEventListener("touchmove", dragMove, { passive: false });
-window.addEventListener("touchend", endDrag);
-
-/* ---------- Zoom Logic ---------- */
+/* ---------- Zoom logic ---------- */
 
 const zoomBtn = document.getElementById("zoomBtn");
 let zoomed = false;
 
+// Save original viewBox
 const origViewBoxStr = svg.getAttribute("viewBox") || "0 0 1800 1500";
 let [origX, origY, origW, origH] = origViewBoxStr.split(/\s+/).map(Number);
 
@@ -1077,12 +1063,16 @@ function computeZoomViewBoxForJaw() {
   const bbox = jawRect.getBBox();
   const worldCenterX = bbox.x + bbox.width / 2 + offsetX;
   const worldCenterY = bbox.y + bbox.height / 2;
+
   const targetW = origW / ZOOM_SCALE;
   const targetH = origH / ZOOM_SCALE;
+
   let vx = worldCenterX - targetW / 2;
   let vy = worldCenterY - targetH / 2;
+
   vx = Math.max(origX, Math.min(vx, origX + origW - targetW));
   vy = Math.max(origY, Math.min(vy, origY + origH - targetH));
+
   return [vx, vy, targetW, targetH, worldCenterX, worldCenterY];
 }
 
@@ -1091,6 +1081,7 @@ function moveTextNearJaw() {
   const ctm = jawRect.getCTM();
   const worldCenterX = ctm.e + bbox.x + bbox.width / 5;
   const worldCenterY = ctm.f + bbox.y + bbox.height / 5;
+
   reading.setAttribute("x", 360);
   reading.setAttribute("y", 360);
   reading.setAttribute("font-size", 70);
@@ -1121,5 +1112,6 @@ zoomBtn.addEventListener("click", async () => {
 </body>
 
 </html>
+
 
 
