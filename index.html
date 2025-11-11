@@ -966,7 +966,8 @@ const reading = document.getElementById("reading");
 const svg = document.getElementById("caliper");
 
 let isDragging = false;
-let startX;
+let startX = 0;
+let dragStartOffset = 0; // ✅ stores position at drag start
 let offsetX = 0;
 const maxMove = 1630;
 const maxReading = 101.65;
@@ -984,6 +985,11 @@ hideBtn.addEventListener("click", () => {
 
 /* ---------- Drag logic (desktop + mobile) ---------- */
 
+// Unified function to get X position (works for mouse & touch)
+function getClientX(e) {
+  return e.touches ? e.touches[0].clientX : e.clientX;
+}
+
 movableFront.addEventListener("mousedown", startDrag);
 movableFront.addEventListener("touchstart", startDrag, { passive: false });
 
@@ -996,13 +1002,14 @@ window.addEventListener("touchend", endDrag);
 function startDrag(e) {
   isDragging = true;
   startX = getClientX(e);
+  dragStartOffset = offsetX; // ✅ remember current position before moving
   e.preventDefault();
 }
 
 function onDrag(e) {
   if (!isDragging) return;
   const dx = getClientX(e) - startX;
-  const newX = Math.min(Math.max(offsetX + dx, 0), maxMove);
+  const newX = Math.min(Math.max(dragStartOffset + dx, 0), maxMove); // ✅ add relative motion
 
   movableBack.setAttribute("transform", `translate(${newX},0)`);
   movableFront.setAttribute("transform", `translate(${newX},0)`);
@@ -1018,12 +1025,8 @@ function onDrag(e) {
 function endDrag(e) {
   if (!isDragging) return;
   const dx = getClientX(e) - startX;
-  offsetX = Math.min(Math.max(offsetX + dx, 0), maxMove);
+  offsetX = Math.min(Math.max(dragStartOffset + dx, 0), maxMove); // ✅ update final offset
   isDragging = false;
-}
-
-function getClientX(e) {
-  return e.touches ? e.touches[0].clientX : e.clientX;
 }
 
 /* ---------- Zoom logic ---------- */
@@ -1113,6 +1116,7 @@ zoomBtn.addEventListener("click", async () => {
 </body>
 
 </html>
+
 
 
 
